@@ -80,11 +80,13 @@ const authenticateUser = async (req: express.Request, res: express.Response, nex
   next();
 };
 
-app.get("/api/health", (_req, res) => {
+const router = express.Router();
+
+router.get("/health", (_req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
-app.post("/api/analyze-report", authenticateUser, async (req, res) => {
+router.post("/analyze-report", authenticateUser, async (req, res) => {
   try {
     const { imageBase64, mimeType } = req.body || {};
     if (!imageBase64) {
@@ -148,7 +150,7 @@ If you cannot identify specific test values from the image, return:
   }
 });
 
-app.post("/api/journal-reflect", authenticateUser, async (req, res) => {
+router.post("/journal-reflect", authenticateUser, async (req, res) => {
   try {
     const { userInput, conversationHistory } = req.body || {};
     if (!userInput || typeof userInput !== "string" || !userInput.trim()) {
@@ -196,7 +198,7 @@ Patient's entry: ${userInput.trim()}`;
   }
 });
 
-app.post("/api/generate-brief", authenticateUser, async (req, res) => {
+router.post("/generate-brief", authenticateUser, async (req, res) => {
   try {
     const { compiledData } = req.body || {};
     if (!compiledData || typeof compiledData !== "string") {
@@ -225,7 +227,7 @@ ${compiledData}`;
   }
 });
 
-app.post("/api/health-companion-chat", authenticateUser, async (req, res) => {
+router.post("/health-companion-chat", authenticateUser, async (req, res) => {
   try {
     const { message, conversationHistory, healthProfile } = req.body || {};
     if (!message || typeof message !== "string" || !message.trim()) {
@@ -275,5 +277,8 @@ Your response:`;
     res.status(500).json({ error: err?.message || "Internal server error in health companion chat" });
   }
 });
+
+app.use("/api", router);
+app.use("/", router);
 
 export default app;
