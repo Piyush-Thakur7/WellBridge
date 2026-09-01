@@ -3,7 +3,7 @@
 [![Google Cloud Gen AI Academy](https://img.shields.io/badge/Google%20Cloud-Gen%20AI%20Academy%20APAC%20C3-4285F4?logo=googlecloud&logoColor=white)](https://hack2skill.com/event/apac-genaiacademy-c3)
 [![Cloud Run AI Challenge](https://img.shields.io/badge/Track-Ideathon%20Challenge-34A853?logo=googlecloud&logoColor=white)](https://codelabs.developers.google.com/codelabs/cloud-run/cloud-run-ai-challenge)
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-wellbridgeai.resence.in-0D9488?logo=vercel&logoColor=white)](https://wellbridgeai.resence.in)
-[![Hashtag](https://img.shields.io/badge/%23AccelerateAIwithCloudRun-Eligible-FBBC05)](https://www.linkedin.com/posts/piyush-singh2007_accelerateaiwithcloudrun-googlecloud-genaiacademy-activity-7500640265091866624-Z0Ap)
+[![Hashtag](https://img.shields.io/badge/%23AccelerateAIwithCloudRun-Eligible-FBBC05)](https://lnkd.in/p/dFWWZ3VU)
 
 > **WellBridge AI** is an enterprise-grade patient healthcare journal, interactive health companion, and multimodal lab report analyzer built for the **Google Cloud Gen AI Academy APAC Cohort 3 Ideathon** in partnership with **Hack2skill**.
 
@@ -124,7 +124,7 @@ gcloud run deploy wellbridge-ai \
 
 * 🌐 **Live Interactive Application:** [https://wellbridgeai.resence.in](https://wellbridgeai.resence.in)
 * 🐙 **Public Code Repository:** [https://github.com/Piyush-Thakur7/WellBridge](https://github.com/Piyush-Thakur7/WellBridge)
-* 📱 **LinkedIn Demo & Social Post:** [LinkedIn Walkthrough Post](https://www.linkedin.com/posts/piyush-singh2007_accelerateaiwithcloudrun-googlecloud-genaiacademy-activity-7500640265091866624-Z0Ap)
+* 📱 **LinkedIn Demo & Social Post:** [https://lnkd.in/p/dFWWZ3VU](https://lnkd.in/p/dFWWZ3VU)
 
 ---
 
