@@ -32,9 +32,10 @@ if (!getApps().length) {
 
 // Fallback Model Ladder for Gemini
 const MODEL_LADDER = [
-  "gemini-2.5-flash",
   "gemini-2.0-flash",
-  "gemini-1.5-flash"
+  "gemini-2.0-flash-exp",
+  "gemini-2.5-flash",
+  "gemini-2.0-flash-lite"
 ];
 
 async function generateWithFallback(prompt: string, inlineData?: { mimeType: string; data: string }) {
