@@ -5,12 +5,11 @@ const app = express();
 app.use(express.json({ limit: "25mb" }));
 app.use(express.urlencoded({ extended: true, limit: "25mb" }));
 
-// Ultra-Fast Optimized Model Ladder for Gemini
+// Official Valid Gemini Production Models
 const MODEL_LADDER = [
-  "gemini-2.5-flash",
   "gemini-2.0-flash",
-  "gemini-flash-latest",
-  "gemini-3.7-flash"
+  "gemini-2.0-flash-lite",
+  "gemini-1.5-flash"
 ];
 
 async function generateWithFallback(prompt: string, inlineData?: { mimeType: string; data: string }) {
@@ -44,7 +43,7 @@ async function generateWithFallback(prompt: string, inlineData?: { mimeType: str
         return response.text;
       }
     } catch (err: any) {
-      console.warn(`Model ${modelName} notice, falling over...`, err?.message || err);
+      console.warn(`Model ${modelName} notice, falling over:`, err?.message || err);
       lastError = err;
     }
   }
