@@ -4,6 +4,12 @@ const app = express();
 app.use(express.json({ limit: "25mb" }));
 app.use(express.urlencoded({ extended: true, limit: "25mb" }));
 
+const TARGET_MODELS = [
+  "gemini-2.5-flash",
+  "gemini-2.0-flash",
+  "gemini-1.5-flash"
+];
+
 async function generateWithGemini(prompt: string, inlineData?: { mimeType: string; data: string }) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
@@ -21,28 +27,34 @@ async function generateWithGemini(prompt: string, inlineData?: { mimeType: strin
   }
   parts.push({ text: prompt });
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey.trim()}`;
+  let lastError: any = null;
 
-  const response = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ contents: [{ parts }] }),
-  });
+  for (const model of TARGET_MODELS) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey.trim()}`;
 
-  const data = await response.json();
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contents: [{ parts }] }),
+      });
 
-  if (!response.ok) {
-    const msg = data?.error?.message || `Google API error (HTTP ${response.status})`;
-    console.error("Gemini API Error details:", JSON.stringify(data));
-    throw new Error(msg);
+      const data = await response.json();
+
+      if (response.ok) {
+        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (text) {
+          return text;
+        }
+      } else {
+        lastError = new Error(data?.error?.message || `HTTP ${response.status} from ${model}`);
+      }
+    } catch (err: any) {
+      lastError = err;
+    }
   }
 
-  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-  if (!text) {
-    throw new Error("Gemini returned an empty response.");
-  }
-
-  return text;
+  throw lastError || new Error("Failed to generate response from Gemini API.");
 }
 
 // Middleware: Authenticate User JWT
