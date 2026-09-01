@@ -1,0 +1,45 @@
+{
+  "entities": {
+    "HealthProfile": {
+      "title": "Health Profile",
+      "description": "User's baseline medical profile including age, gender, conditions, medications, allergies, and lifestyle",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "age": { "type": "string", "maxLength": 50 },
+        "gender": { "type": "string", "maxLength": 50 },
+        "conditions": { "type": "string", "maxLength": 500 },
+        "medications": { "type": "string", "maxLength": 500 },
+        "allergies": { "type": "string", "maxLength": 500 },
+        "lifestyle": { "type": "string", "maxLength": 500 },
+        "isComplete": { "type": "boolean" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "isComplete"]
+    },
+    "Interaction": {
+      "title": "Health Log Entry",
+      "description": "Health log entries including lab scans, journal reflections, and doctor briefs",
+      "type": "object",
+      "properties": {
+        "type": { "type": "string", "enum": ["lab_scan", "journal", "doctor_brief"] },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "plainSummary": { "type": "string", "maxLength": 3000 },
+        "userText": { "type": "string", "maxLength": 5000 },
+        "aiReflection": { "type": "string", "maxLength": 5000 },
+        "briefContent": { "type": "string", "maxLength": 10000 }
+      },
+      "required": ["type"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}/health_profile/{docId}": {
+      "schema": "HealthProfile",
+      "description": "User baseline health and medical questionnaire profile"
+    },
+    "/users/{userId}/interactions/{interactionId}": {
+      "schema": "Interaction",
+      "description": "Per-user isolated log of health records and AI reflections"
+    }
+  }
+}
