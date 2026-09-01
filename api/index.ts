@@ -1,14 +1,14 @@
-import express from "express";
+﻿import express from "express";
 
 const app = express();
 app.use(express.json({ limit: "25mb" }));
 app.use(express.urlencoded({ extended: true, limit: "25mb" }));
 
 const TARGET_MODELS = [
-  "gemini-2.0-flash",
-  "gemini-2.0-flash-exp",
-  "gemini-2.5-flash",
-  "gemini-2.0-flash-lite"
+  "gemini-3.5-flash-lite",
+  "gemini-3.5-flash",
+  "gemini-3.6-flash",
+  "gemini-3.7-flash"
 ];
 
 async function generateWithGemini(prompt: string, inlineData?: { mimeType: string; data: string }) {
