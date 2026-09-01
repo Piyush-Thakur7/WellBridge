@@ -1,85 +1,48 @@
 ﻿import express from "express";
-import { GoogleGenAI } from "@google/genai";
 
 const app = express();
 app.use(express.json({ limit: "25mb" }));
 app.use(express.urlencoded({ extended: true, limit: "25mb" }));
 
-const MODELS = [
-  "gemini-1.5-flash",
-  "gemini-2.0-flash",
-  "gemini-1.5-pro"
-];
-
-async function generateWithFallback(prompt: string, inlineData?: { mimeType: string; data: string }) {
+async function generateWithGemini(prompt: string, inlineData?: { mimeType: string; data: string }) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    throw new Error("GEMINI_API_KEY environment variable is missing.");
+    throw new Error("GEMINI_API_KEY environment variable is missing on Vercel.");
   }
 
-  let lastError: any = null;
-
-  // 1. Direct REST fetch to Google AI Studio v1beta & v1 endpoints
-  for (const model of MODELS) {
-    for (const apiVer of ["v1beta", "v1"]) {
-      try {
-        const parts: any[] = [];
-        if (inlineData) {
-          parts.push({
-            inline_data: {
-              mime_type: inlineData.mimeType,
-              data: inlineData.data,
-            }
-          });
-        }
-        parts.push({ text: prompt });
-
-        const response = await fetch(
-          `https://generativelanguage.googleapis.com/${apiVer}/models/${model}:generateContent?key=${apiKey}`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ contents: [{ parts }] }),
-          }
-        );
-
-        if (response.ok) {
-          const data = await response.json();
-          const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-          if (text) {
-            return text;
-          }
-        } else {
-          const errorData = await response.json().catch(() => ({}));
-          lastError = new Error(errorData?.error?.message || `HTTP ${response.status} from ${model}`);
-        }
-      } catch (err: any) {
-        lastError = err;
+  const parts: any[] = [];
+  if (inlineData) {
+    parts.push({
+      inline_data: {
+        mime_type: inlineData.mimeType,
+        data: inlineData.data,
       }
-    }
+    });
+  }
+  parts.push({ text: prompt });
+
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey.trim()}`;
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ contents: [{ parts }] }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    const msg = data?.error?.message || `Google API error (HTTP ${response.status})`;
+    console.error("Gemini API Error details:", JSON.stringify(data));
+    throw new Error(msg);
   }
 
-  // 2. Fallback via Official SDK
-  try {
-    const ai = new GoogleGenAI({ apiKey });
-    for (const m of ["gemini-1.5-flash", "gemini-2.0-flash"]) {
-      try {
-        const sdkRes = await ai.models.generateContent({
-          model: m,
-          contents: prompt,
-        });
-        if (sdkRes && sdkRes.text) {
-          return sdkRes.text;
-        }
-      } catch (e) {
-        // continue
-      }
-    }
-  } catch (sdkErr) {
-    // ignore
+  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!text) {
+    throw new Error("Gemini returned an empty response.");
   }
 
-  throw lastError || new Error("All Gemini API models failed to generate response.");
+  return text;
 }
 
 // Middleware: Authenticate User JWT
@@ -160,7 +123,7 @@ If you cannot identify specific test values from the image, return:
   "doctorQuestions": ["Ask your doctor to walk you through this report with you"]
 }`;
 
-    const rawText = await generateWithFallback(prompt, {
+    const rawText = await generateWithGemini(prompt, {
       mimeType: cleanMimeType,
       data: cleanBase64,
     });
@@ -212,7 +175,7 @@ For mood: choose the single best match based on their overall tone.
 ${historyContext}
 Patient's entry: ${userInput.trim()}`;
 
-    const rawText = await generateWithFallback(prompt);
+    const rawText = await generateWithGemini(prompt);
     let parsedData;
     try {
       const jsonMatch = rawText.match(/\{[\s\S]*\}/);
@@ -250,7 +213,7 @@ Use professional but clear language. Be concise. This will be printed on one pag
 Patient data from past 30 days:
 ${compiledData}`;
 
-    const briefText = await generateWithFallback(prompt);
+    const briefText = await generateWithGemini(prompt);
     res.json({ briefContent: briefText });
   } catch (err: any) {
     console.error("Generate brief API error:", err);
@@ -301,7 +264,7 @@ Instructions:
 
 Your response:`;
 
-    const aiReply = await generateWithFallback(prompt);
+    const aiReply = await generateWithGemini(prompt);
     res.json({ reply: aiReply.trim() });
   } catch (err: any) {
     console.error("Health companion chat API error:", err);
