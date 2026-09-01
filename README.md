@@ -1,24 +1,89 @@
-# WellBridge AI — Patient Health Journal & Multimodal Medical Report Demystifier
+﻿# 🌿 WellBridge AI — Patient Health Journal & Multimodal Medical Report Demystifier
 
-WellBridge AI is an enterprise-grade patient healthcare journal, interactive health companion, and multimodal lab report analyzer built with React, Tailwind CSS, Google Cloud Firestore, Firebase Authentication, and the Gemini 3.6/3.7 Flash API.
+[![Google Cloud Gen AI Academy](https://img.shields.io/badge/Google%20Cloud-Gen%20AI%20Academy%20APAC%20C3-4285F4?logo=googlecloud&logoColor=white)](https://hack2skill.com/event/apac-genaiacademy-c3)
+[![Cloud Run AI Challenge](https://img.shields.io/badge/Track-Ideathon%20Challenge-34A853?logo=googlecloud&logoColor=white)](https://codelabs.developers.google.com/codelabs/cloud-run/cloud-run-ai-challenge)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-wellbridgeai.resence.in-0D9488?logo=vercel&logoColor=white)](https://wellbridgeai.resence.in)
+[![Hashtag](https://img.shields.io/badge/%23AccelerateAIwithCloudRun-Eligible-FBBC05)](https://www.linkedin.com/posts/piyush-singh2007_accelerateaiwithcloudrun-googlecloud-genaiacademy-activity-7500640265091866624-Z0Ap)
+
+> **WellBridge AI** is an enterprise-grade patient healthcare journal, interactive health companion, and multimodal lab report analyzer built for the **Google Cloud Gen AI Academy APAC Cohort 3 Ideathon** in partnership with **Hack2skill**.
 
 ---
 
-## 🛡️ Agentic Threat Modeling & Countermeasures
+## 🌟 The Problem & Solution
 
-| Threat Zone | Identified Attack Vector | Production Countermeasure |
+* **The Problem:** Over **88% of adults lack proficient health literacy**. When patients receive diagnostic blood reports, they are often confronted with intimidating medical jargon — leading to anxiety, endless symptom Googling, and rushed 3-minute doctor visits where crucial symptoms are forgotten.
+* **The Solution:** WellBridge AI serves as an intelligent, empathetic bridge between hurried clinical appointments and daily patient wellness, translating complex tests into plain language and compiling 30-day longitudinal health briefs for physicians.
+
+---
+
+## 🏛️ System Architecture
+
+```mermaid
+flowchart TD
+    subgraph Client ["Client Layer (React 19 + Tailwind CSS + Vite)"]
+        A1["Landing Page & Auth Guard"]
+        A2["AI Health Companion Chat"]
+        A3["Multimodal Lab Report Scanner"]
+        A4["Daily Symptom Journal"]
+        A5["1-Click Doctor Visit Brief Generator"]
+        A6["Real-time Health History Sidebar"]
+    end
+
+    subgraph AuthSecurity ["Security & Identity Layer"]
+        B1["Firebase Authentication (Google OAuth)"]
+        B2["JWT Cryptographic Token Verification"]
+        B3["Zero-Trust Firestore Security Rules"]
+    end
+
+    subgraph Backend ["Backend & Serverless Layer"]
+        C1["Express & Vercel / Cloud Run Serverless Handler"]
+        C2["Google Cloud Secret Manager (API Key Isolation)"]
+    end
+
+    subgraph AI ["Google Gemini AI Engine"]
+        D1["Gemini 3.5 Flash Lite / Gemini 3.5 Flash (Primary)"]
+        D2["Gemini Vision Multimodal OCR Engine"]
+        D3["Multi-turn Contextual Health Reasoning Ladder"]
+    end
+
+    subgraph Database ["Cloud Firestore Persistence"]
+        E1["/users/{userId}/health_profile (Baseline Context)"]
+        E2["/users/{userId}/health_logs (Isolated Records)"]
+    end
+
+    Client --> AuthSecurity
+    AuthSecurity --> Backend
+    Backend --> AI
+    Backend --> Database
+```
+
+---
+
+## 🚀 Key Features
+
+| Feature | Powered By | Description |
 | :--- | :--- | :--- |
-| **Input Surfaces** | Malicious PDF/Image payloads, oversized buffer injection | Strict schema validation, base64 payload size limiting (25MB max), and non-executable sanitization |
-| **Planning & Reasoning** | Prompt injection in patient symptoms or OCR test fields | Defensive prompt isolation; user input treated strictly as data literals rather than instructions |
-| **Tool & AI Execution** | Gemini rate limits (`429`), temporary service unavailability (`503`) | Resilient model fallback ladder (`gemini-3.6-flash` ➔ `gemini-3.1-flash-lite` ➔ `gemini-flash-latest` ➔ `gemini-3.7-flash`) |
-| **Memory & State** | Cross-user patient data leakage, unauthorized read/write | Strict owner-bound Firestore security rules (`request.auth.uid == userId`) and zero insecure default rules |
-| **Inter-System / Secrets** | Client-side API key leakage, token forgery | Firebase ID token verification server-side; `GEMINI_API_KEY` stored strictly in Secret Manager / backend environment variables |
+| **📸 Multimodal Lab Report Scanner** | Gemini Vision OCR | Upload photos or PDFs of blood panels. Receives plain-language summaries and visual **Traffic-Light Cards** (🟢 Normal, 🟡 Monitor, 🔴 Alert), plus 3 physician discussion questions. |
+| **💬 AI Health Companion** | Gemini 3.5 Flash | Conversational assistant that onboards patient medical background (conditions, medications, allergies, lifestyle) and provides contextual wellness answers. |
+| **📝 Daily Symptom Journal** | Gemini Multi-Turn | Safe space to log daily physical feelings and medication reactions, complete with automated 2-sentence summaries and symptom tags (`#fatigue`, `#hydration`). |
+| **📋 1-Click Doctor Visit Brief** | Gemini Synthesis | Compiles 30 days of symptom logs, medication reactions, and lab trends into a structured, printable 1-page clinical brief for physicians. |
+| **📊 Real-Time Health History** | Cloud Firestore | Isolated chronological stream with category filter chips (**All**, **Lab Scans**, **Journal**, **Briefs**) and instant detail modals. |
 
 ---
 
-## 🔒 Firestore Security Rules
+## 🛡️ Security, Privacy & Threat Modeling
 
-Deploy the following security rules to protect patient health records and profile collections:
+| Threat Zone | Identified Attack Vector | Production Countermeasure | Status |
+| :--- | :--- | :--- | :---: |
+| **Input Surfaces** | Malicious PDF/Image payloads, oversized buffer injection | Strict schema validation, base64 payload size limiting (25MB max), and non-executable sanitization | 🟢 PASS |
+| **Planning & Reasoning** | Prompt injection in patient symptoms or OCR test fields | Defensive prompt isolation; user input treated strictly as data literals rather than instructions | 🟢 PASS |
+| **Tool & AI Execution** | Gemini rate limits (`429`), temporary service unavailability (`503`) | Resilient model fallback ladder (`gemini-3.5-flash-lite` ➔ `gemini-3.5-flash` ➔ `gemini-3.6-flash` ➔ `gemini-3.7-flash`) | 🟢 PASS |
+| **Memory & State** | Cross-user patient data leakage, unauthorized read/write | Strict owner-bound Firestore security rules (`request.auth.uid == userId`) and zero insecure default rules | 🟢 PASS |
+| **Inter-System / Secrets** | Client-side API key leakage, token forgery | Firebase ID token verification server-side; `GEMINI_API_KEY` stored strictly in Secret Manager / backend environment variables | 🟢 PASS |
+
+---
+
+## 🔒 Cloud Firestore Security Rules
 
 ```javascript
 rules_version = '2';
@@ -36,29 +101,14 @@ service cloud.firestore {
 
 ---
 
-## 🔑 Secret Management Setup (Google Cloud Secret Manager)
-
-Store your Gemini API key in Google Cloud Secret Manager and grant access to the Cloud Run runtime service account:
+## ☁️ Google Cloud Run Deployment & Campaign Labeling
 
 ```bash
-# 1. Create and populate the secret
+# 1. Store Gemini API key in Google Cloud Secret Manager
 gcloud secrets create GEMINI_API_KEY --replication-policy="automatic"
 echo -n "YOUR_GEMINI_API_KEY" | gcloud secrets versions add GEMINI_API_KEY --data-file=-
 
-# 2. Grant the default Cloud Run service account access to read the secret
-gcloud secrets add-iam-policy-binding GEMINI_API_KEY \
-  --member="serviceAccount:YOUR_PROJECT_NUMBER-compute@developer.gserviceaccount.com" \
-  --role="roles/secretmanager.secretAccessor"
-```
-
----
-
-## 🚀 Google Cloud Run Deployment
-
-Deploy the full-stack container service to Google Cloud Run:
-
-```bash
-# 1. Build and deploy container to Cloud Run
+# 2. Build and deploy container to Cloud Run with official challenge label
 gcloud run deploy wellbridge-ai \
   --source . \
   --region us-central1 \
@@ -66,49 +116,16 @@ gcloud run deploy wellbridge-ai \
   --allow-unauthenticated \
   --set-secrets GEMINI_API_KEY=GEMINI_API_KEY:latest \
   --update-labels=dev-tutorial=cloud-run-ai-challenge
-
-# 2. Apply campaign verification label binding
-gcloud run services update wellbridge-ai \
-  --update-labels=dev-tutorial=cloud-run-ai-challenge \
-  --region=us-central1
 ```
 
 ---
 
-## 📋 Comprehensive Functional Stability & Verification Walkthrough
+## 🔗 Official Submission Links
 
-The following test walkthrough cases cover all user interactions and workflows:
+* 🌐 **Live Interactive Application:** [https://wellbridgeai.resence.in](https://wellbridgeai.resence.in)
+* 🐙 **Public Code Repository:** [https://github.com/Piyush-Thakur7/WellBridge](https://github.com/Piyush-Thakur7/WellBridge)
+* 📱 **LinkedIn Demo & Social Post:** [LinkedIn Walkthrough Post](https://www.linkedin.com/posts/piyush-singh2007_accelerateaiwithcloudrun-googlecloud-genaiacademy-activity-7500640265091866624-Z0Ap)
 
-### Test Case 1: Landing Page & Navigation Bar
-1. **Initial Visit**: Navigate to root URL. Verify the fixed top navbar with WellBridge logo, brand title, and quick-scroll navigation links (**Features**, **How It Works**, **Trust**, **FAQ**), plus the **Get Started** button.
-2. **Smooth Scrolling**: Click **Features**, **How It Works**, **Trust**, and **FAQ** to verify animated scroll positioning.
-3. **Federated Sign-In**: Click **Continue with Google** or **Get Started**. Authenticate through the Firebase Google Auth popup.
-4. **State Transition**: Confirm immediate redirect to the private patient dashboard with user profile picture and email displayed in the header.
+---
 
-### Test Case 2: AI Health Companion Chat (Interactive Health Assistant)
-1. **First-Time Setup Flow**: Locate the **💬 Your Health Companion** card positioned directly between Doctor Visit Brief and Lab Report Scanner.
-2. **Proactive Questions**: Observe the initial question asking for age and gender. Answer with e.g. *"34, female"*.
-3. **Progressive Profile Building**: Answer conditions (*"mild asthma"*), medications (*"albuterol inhaler"*), allergies (*"penicillin"*), and lifestyle (*"moderate active"*).
-4. **Profile Persistence**: Verify status badge updates to **Health Profile: Complete ✅** and is saved under `/users/{userId}/health_profile/current`.
-5. **General Q&A**: Ask a health question (e.g. *"Can asthma symptoms worsen during cold weather?"*). Confirm the companion answers warmly, cites baseline profile context, suggests questions for the doctor, and appends the mandatory medical disclaimer: *"ℹ️ This is general wellness information, not medical advice."*
-
-### Test Case 3: Multimodal Lab Report Scanner
-1. **Upload Trigger**: Drag and drop or browse a blood test report (e.g. CBC or Metabolic panel in PNG/JPEG/PDF format).
-2. **Analysis Progress**: Verify the spinning teal loader and "Analyzing your report with AI..." indicator.
-3. **Structured Rendering**: Check that the **Report Summary** card renders in teal, the **Your Results** grid displays biomarkers with correct status pill colors (Normal ✅, Monitor ⚠️, Discuss with Doctor 🔴), and 3 doctor questions are listed.
-4. **Data Isolation & Save**: Confirm the scanned report is saved to `/users/{userId}/health_logs` and appears immediately in the **Health History** sidebar.
-
-### Test Case 4: Daily Symptom & Wellness Journal
-1. **Input Submission**: Type a symptom entry (e.g., *"I felt dizzy this morning after taking my blood pressure medicine. My energy was low until afternoon..."*) and click **Reflect with AI ✨**.
-2. **Empathetic AI Feedback**: Verify chat bubble appears with warm reflection, executive observation summary, hashtag wellness tags, and mood pill (`💚 Energized`, `🧡 Resting`, or `❤️ In Pain`).
-3. **Multi-Turn Context**: Type a follow-up message and confirm the AI maintains conversational context across turns.
-
-### Test Case 5: Doctor Visit Brief Generator
-1. **One-Click Generation**: Click **📋 Generate Doctor Visit Brief**.
-2. **Data Aggregation**: Verify the past 30-day health logs and lab scans are compiled into a 4-section structured physician brief.
-3. **Print & Save**: Click **🖨️ Print Brief** to trigger browser print dialog with clean, un-nested print layout. Click **Save Brief** to persist to Firestore.
-
-### Test Case 6: Real-time Health History Sidebar
-1. **Filter Verification**: Click filter chips (**All**, **🔬 Lab Scans**, **📝 Journal**, **📋 Briefs**) and verify the list updates.
-2. **Detail Modal**: Click on any history card to open the expanded modal with full biomarkers or reflection details.
-3. **Deletion**: Click the trash icon to delete an entry and verify immediate Firestore synchronization.
+#AccelerateAIwithCloudRun #GoogleCloud #GenAIAcademy #Hack2skill #CloudRun #GeminiAI #HealthcareAI
