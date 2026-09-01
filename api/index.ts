@@ -6,10 +6,9 @@ app.use(express.json({ limit: "25mb" }));
 app.use(express.urlencoded({ extended: true, limit: "25mb" }));
 
 const MODELS = [
+  "gemini-1.5-flash",
   "gemini-2.0-flash",
-  "gemini-2.0-flash-lite",
-  "gemini-1.5-flash-latest",
-  "gemini-1.5-pro-latest"
+  "gemini-1.5-pro"
 ];
 
 async function generateWithFallback(prompt: string, inlineData?: { mimeType: string; data: string }) {
@@ -20,55 +19,61 @@ async function generateWithFallback(prompt: string, inlineData?: { mimeType: str
 
   let lastError: any = null;
 
-  // Primary: Direct REST call to Google Generative Language API (Fastest & 100% Reliable)
+  // 1. Direct REST fetch to Google AI Studio v1beta & v1 endpoints
   for (const model of MODELS) {
-    try {
-      const parts: any[] = [];
-      if (inlineData) {
-        parts.push({
-          inline_data: {
-            mime_type: inlineData.mimeType,
-            data: inlineData.data,
+    for (const apiVer of ["v1beta", "v1"]) {
+      try {
+        const parts: any[] = [];
+        if (inlineData) {
+          parts.push({
+            inline_data: {
+              mime_type: inlineData.mimeType,
+              data: inlineData.data,
+            }
+          });
+        }
+        parts.push({ text: prompt });
+
+        const response = await fetch(
+          `https://generativelanguage.googleapis.com/${apiVer}/models/${model}:generateContent?key=${apiKey}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ contents: [{ parts }] }),
           }
-        });
-      }
-      parts.push({ text: prompt });
+        );
 
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ contents: [{ parts }] }),
+        if (response.ok) {
+          const data = await response.json();
+          const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (text) {
+            return text;
+          }
+        } else {
+          const errorData = await response.json().catch(() => ({}));
+          lastError = new Error(errorData?.error?.message || `HTTP ${response.status} from ${model}`);
         }
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (text) {
-          return text;
-        }
-      } else {
-        const errorData = await response.json().catch(() => ({}));
-        console.warn(`Model ${model} returned error:`, errorData);
-        lastError = new Error(errorData?.error?.message || `HTTP ${response.status} from ${model}`);
+      } catch (err: any) {
+        lastError = err;
       }
-    } catch (err: any) {
-      console.warn(`Network error calling ${model}:`, err?.message || err);
-      lastError = err;
     }
   }
 
-  // Secondary Fallback: SDK Client
+  // 2. Fallback via Official SDK
   try {
     const ai = new GoogleGenAI({ apiKey });
-    const sdkRes = await ai.models.generateContent({
-      model: "gemini-2.0-flash",
-      contents: prompt,
-    });
-    if (sdkRes && sdkRes.text) {
-      return sdkRes.text;
+    for (const m of ["gemini-1.5-flash", "gemini-2.0-flash"]) {
+      try {
+        const sdkRes = await ai.models.generateContent({
+          model: m,
+          contents: prompt,
+        });
+        if (sdkRes && sdkRes.text) {
+          return sdkRes.text;
+        }
+      } catch (e) {
+        // continue
+      }
     }
   } catch (sdkErr) {
     // ignore
