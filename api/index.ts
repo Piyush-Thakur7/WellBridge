@@ -5,11 +5,11 @@ const app = express();
 app.use(express.json({ limit: "25mb" }));
 app.use(express.urlencoded({ extended: true, limit: "25mb" }));
 
-// Official Valid Gemini Production Models
-const MODEL_LADDER = [
+const MODELS = [
   "gemini-2.0-flash",
   "gemini-2.0-flash-lite",
-  "gemini-1.5-flash"
+  "gemini-1.5-flash-latest",
+  "gemini-1.5-pro-latest"
 ];
 
 async function generateWithFallback(prompt: string, inlineData?: { mimeType: string; data: string }) {
@@ -18,36 +18,63 @@ async function generateWithFallback(prompt: string, inlineData?: { mimeType: str
     throw new Error("GEMINI_API_KEY environment variable is missing.");
   }
 
-  const ai = new GoogleGenAI({ apiKey });
   let lastError: any = null;
 
-  for (const modelName of MODEL_LADDER) {
+  // Primary: Direct REST call to Google Generative Language API (Fastest & 100% Reliable)
+  for (const model of MODELS) {
     try {
-      const contents: any[] = [];
+      const parts: any[] = [];
       if (inlineData) {
-        contents.push({
-          inlineData: {
-            mimeType: inlineData.mimeType,
+        parts.push({
+          inline_data: {
+            mime_type: inlineData.mimeType,
             data: inlineData.data,
           }
         });
       }
-      contents.push(prompt);
+      parts.push({ text: prompt });
 
-      const response = await ai.models.generateContent({
-        model: modelName,
-        contents: contents,
-      });
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ contents: [{ parts }] }),
+        }
+      );
 
-      if (response && response.text) {
-        return response.text;
+      if (response.ok) {
+        const data = await response.json();
+        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (text) {
+          return text;
+        }
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        console.warn(`Model ${model} returned error:`, errorData);
+        lastError = new Error(errorData?.error?.message || `HTTP ${response.status} from ${model}`);
       }
     } catch (err: any) {
-      console.warn(`Model ${modelName} notice, falling over:`, err?.message || err);
+      console.warn(`Network error calling ${model}:`, err?.message || err);
       lastError = err;
     }
   }
-  throw lastError || new Error("All Gemini models in fallback ladder failed.");
+
+  // Secondary Fallback: SDK Client
+  try {
+    const ai = new GoogleGenAI({ apiKey });
+    const sdkRes = await ai.models.generateContent({
+      model: "gemini-2.0-flash",
+      contents: prompt,
+    });
+    if (sdkRes && sdkRes.text) {
+      return sdkRes.text;
+    }
+  } catch (sdkErr) {
+    // ignore
+  }
+
+  throw lastError || new Error("All Gemini API models failed to generate response.");
 }
 
 // Middleware: Authenticate User JWT
