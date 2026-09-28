@@ -128,31 +128,83 @@ export const DoctorBriefGenerator: React.FC<DoctorBriefGeneratorProps> = ({ user
   };
 
   return (
-    <div id="doctor-brief-section" className="space-y-4">
-      {/* Compact Teal Action Button */}
-      <div className="flex items-center justify-between">
-        <button
-          id="generate-doctor-brief-btn"
-          onClick={generateBrief}
-          disabled={isGenerating}
-          className="inline-flex items-center gap-2 bg-teal-600 text-white py-2 px-4 rounded-xl font-medium hover:bg-teal-700 shadow-xs transition-all text-xs sm:text-sm cursor-pointer disabled:opacity-75 disabled:pointer-events-none"
-        >
-          {isGenerating ? (
-            <>
-              <Loader2 className="w-3.5 h-3.5 animate-spin" />
-              <span>Compiling 30-day health records...</span>
-            </>
-          ) : (
-            <>
-              <span className="text-sm">📋</span>
-              <span>Generate Doctor Visit Brief</span>
-            </>
-          )}
-        </button>
+    <div id="doctor-brief-section" className="space-y-6">
+      {/* Hero Overview & Action Card */}
+      <div className="bg-white rounded-2xl p-5 sm:p-6 border border-teal-100 shadow-xs space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-teal-700 bg-teal-50 border border-teal-200 px-2.5 py-0.5 rounded-full">
+                Clinical Workflow
+              </span>
+              <span className="text-[10px] font-semibold text-slate-400">
+                • 30-Day Synthesis
+              </span>
+            </div>
+            <h2 className="text-base sm:text-xl font-bold text-slate-900">
+              Doctor Visit Clinical Brief
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-500 max-w-2xl">
+              Consolidate your logged symptoms, medication reactions, and lab test results into an organized, 1-page summary prepared for your physician.
+            </p>
+          </div>
+
+          <button
+            id="generate-doctor-brief-btn"
+            onClick={generateBrief}
+            disabled={isGenerating}
+            className="inline-flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-700 text-white py-2.5 px-5 rounded-xl font-semibold shadow-xs transition-all text-xs sm:text-sm cursor-pointer disabled:opacity-75 disabled:pointer-events-none shrink-0"
+          >
+            {isGenerating ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Compiling 30-Day Records...</span>
+              </>
+            ) : (
+              <>
+                <Sparkles className="w-4 h-4" />
+                <span>{briefContent ? "Regenerate Brief" : "Generate Doctor Visit Brief"}</span>
+              </>
+            )}
+          </button>
+        </div>
+
+        {/* 3-Pillar Clinical Summary Features */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-slate-100 text-xs">
+          <div className="bg-slate-50/80 p-3 rounded-xl border border-slate-100">
+            <div className="flex items-center gap-1.5 font-semibold text-slate-800 mb-1">
+              <span className="text-teal-600">🩺</span>
+              <span>Chief Symptoms</span>
+            </div>
+            <p className="text-[11px] text-slate-500 leading-relaxed">
+              Synthesizes daily journal check-ins, mood ratings, and timeline progression.
+            </p>
+          </div>
+
+          <div className="bg-slate-50/80 p-3 rounded-xl border border-slate-100">
+            <div className="flex items-center gap-1.5 font-semibold text-slate-800 mb-1">
+              <span className="text-teal-600">🧪</span>
+              <span>Lab Highlights</span>
+            </div>
+            <p className="text-[11px] text-slate-500 leading-relaxed">
+              Surfaces monitored biomarkers and out-of-range blood report findings.
+            </p>
+          </div>
+
+          <div className="bg-slate-50/80 p-3 rounded-xl border border-slate-100">
+            <div className="flex items-center gap-1.5 font-semibold text-slate-800 mb-1">
+              <span className="text-teal-600">💬</span>
+              <span>Physician Questions</span>
+            </div>
+            <p className="text-[11px] text-slate-500 leading-relaxed">
+              Provides targeted questions to maximize the value of your 15-minute consultation.
+            </p>
+          </div>
+        </div>
       </div>
 
       {errorMsg && (
-        <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl flex items-center justify-between">
+        <div className="p-3.5 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl flex items-center justify-between">
           <div className="flex items-center gap-2">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{errorMsg}</span>
