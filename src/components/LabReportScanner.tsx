@@ -167,7 +167,7 @@ export const LabReportScanner: React.FC<LabReportScannerProps> = ({ user, onScan
           </p>
         </div>
         <div className="flex items-center gap-2">
-          {scanResult ? (
+          {scanResult && (
             <button
               onClick={resetScanner}
               className="flex items-center gap-1.5 text-xs text-teal-600 hover:text-teal-700 bg-teal-50 border border-teal-200 px-3 py-1 rounded-full font-medium transition cursor-pointer"
@@ -175,10 +175,6 @@ export const LabReportScanner: React.FC<LabReportScannerProps> = ({ user, onScan
               <RefreshCw className="w-3 h-3" />
               <span>Scan Another</span>
             </button>
-          ) : (
-            <div className="bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">
-              ✅ Ready to Scan
-            </div>
           )}
         </div>
       </div>
