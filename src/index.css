@@ -1,1 +1,39 @@
 @import "tailwindcss";
+
+/* Strict Print Isolation Engine for Doctor Visit Brief */
+@media print {
+  /* Hide the entire website by default */
+  body * {
+    visibility: hidden !important;
+  }
+
+  /* Make ONLY the doctor brief print container and its children visible */
+  #doctor-brief-print-area,
+  #doctor-brief-print-area * {
+    visibility: visible !important;
+  }
+
+  /* Position cleanly at the top of the physical printed page */
+  #doctor-brief-print-area {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 1.5cm !important;
+    background: white !important;
+    color: black !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  /* Hide interactive action buttons during print */
+  .no-print,
+  button,
+  header,
+  footer,
+  nav,
+  aside {
+    display: none !important;
+  }
+}

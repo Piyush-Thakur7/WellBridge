@@ -213,9 +213,9 @@ export const HealthHistorySidebar: React.FC<HealthHistorySidebarProps> = ({ user
 
       {/* DETAIL MODAL FOR SELECTED ENTRY */}
       {selectedEntry && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-xl w-full max-h-[85vh] overflow-y-auto p-5 sm:p-6 shadow-xl border border-slate-200">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl max-w-xl w-full max-h-[92vh] flex flex-col shadow-2xl border border-slate-200 overflow-hidden my-auto">
+            <div className="flex items-center justify-between p-4 sm:p-5 border-b border-slate-200 shrink-0 bg-slate-50/80">
               <div className="flex items-center gap-2">
                 <span className="text-xl">
                   {selectedEntry.type === "lab_scan" && "📸"}
@@ -254,7 +254,7 @@ export const HealthHistorySidebar: React.FC<HealthHistorySidebarProps> = ({ user
             </div>
 
             {/* Modal Body Based on Type */}
-            <div className="mt-4 space-y-3.5 text-xs">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 text-xs overscroll-contain">
               {/* Lab Scan Body */}
               {selectedEntry.type === "lab_scan" && (
                 <>
@@ -271,7 +271,10 @@ export const HealthHistorySidebar: React.FC<HealthHistorySidebarProps> = ({ user
                           <div key={idx} className="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
                             <div className="flex justify-between items-start gap-1">
                               <span className="font-medium text-xs text-slate-700">{m.metricName}</span>
-                              <span className="text-[10px] font-bold text-slate-600 uppercase">{m.status}</span>
+                              <span className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${
+                                m.status === 'normal' ? 'bg-emerald-100 text-emerald-800' :
+                                m.status === 'monitor' ? 'bg-amber-100 text-amber-800' : 'bg-rose-100 text-rose-800'
+                              }`}>{m.status}</span>
                             </div>
                             <p className="text-sm font-bold text-slate-900 mt-1">{m.value}</p>
                             <p className="text-[11px] text-slate-500 mt-0.5">{m.explanation}</p>
@@ -338,7 +341,8 @@ export const HealthHistorySidebar: React.FC<HealthHistorySidebarProps> = ({ user
               )}
             </div>
 
-            <div className="mt-4 pt-3 border-t border-slate-100 text-right">
+            {/* Pinned Footer */}
+            <div className="p-3.5 border-t border-slate-100 text-right shrink-0 bg-slate-50/50">
               <button
                 onClick={() => setSelectedEntry(null)}
                 className="px-4 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium rounded-lg transition cursor-pointer"

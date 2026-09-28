@@ -165,7 +165,7 @@ export const DoctorBriefGenerator: React.FC<DoctorBriefGeneratorProps> = ({ user
 
       {/* RENDER BRIEF CARD */}
       {briefContent && (
-        <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs print:border-none print:shadow-none print:p-0">
+        <div id="doctor-brief-print-area" className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs print:border-none print:shadow-none print:p-0">
           {/* Header Row with Title and Action Buttons */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3.5 border-b border-slate-200">
             <div>

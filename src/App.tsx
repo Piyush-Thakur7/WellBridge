@@ -9,13 +9,14 @@ import { SymptomJournal } from "./components/SymptomJournal";
 import { DoctorBriefGenerator } from "./components/DoctorBriefGenerator";
 import { HealthCompanion } from "./components/HealthCompanion";
 import { HealthHistorySidebar } from "./components/HealthHistorySidebar";
+import { Activity, MessageSquareHeart, FileText, ClipboardList, History } from "lucide-react";
 
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [authError, setAuthError] = useState<string | null>(null);
   const [historyRefreshKey, setHistoryRefreshKey] = useState(0);
-  const [activeTabMobile, setActiveTabMobile] = useState<"dashboard" | "history">("dashboard");
+  const [activeTab, setActiveTab] = useState<'companion' | 'scanner' | 'journal' | 'brief' | 'history'>('companion');
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -67,92 +68,107 @@ export default function App() {
     return <LandingPage onSignIn={handleSignIn} isLoading={authLoading} error={authError} />;
   }
 
-  // Authenticated Patient Dashboard
+  const tabs = [
+    { id: 'companion', label: 'AI Companion', icon: MessageSquareHeart, badge: 'Live' },
+    { id: 'scanner', label: 'Lab Scanner', icon: FileText, badge: 'Vision OCR' },
+    { id: 'journal', label: 'Daily Journal', icon: Activity, badge: null },
+    { id: 'brief', label: 'Doctor Brief', icon: ClipboardList, badge: '1-Click' },
+    { id: 'history', label: 'Health History', icon: History, badge: null },
+  ];
+
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col selection:bg-teal-100 selection:text-teal-900">
-      {/* SECTION B: APP HEADER */}
-      <AppHeader user={user} onSignOut={handleSignOut} />
-
-      {/* SECTION C: MEDICAL DISCLAIMER BANNER */}
-      <MedicalDisclaimerBanner />
-
-      {/* Mobile Tab Switcher */}
-      <div className="md:hidden bg-white border-b border-slate-100 px-4 py-2 flex items-center justify-around">
-        <button
-          onClick={() => setActiveTabMobile("dashboard")}
-          className={`text-xs font-semibold py-1.5 px-4 rounded-xl transition ${
-            activeTabMobile === "dashboard"
-              ? "bg-teal-600 text-white"
-              : "text-slate-600 hover:bg-slate-50"
-          }`}
-        >
-          🩺 Health Dashboard
-        </button>
-        <button
-          onClick={() => setActiveTabMobile("history")}
-          className={`text-xs font-semibold py-1.5 px-4 rounded-xl transition ${
-            activeTabMobile === "history"
-              ? "bg-teal-600 text-white"
-              : "text-slate-600 hover:bg-slate-50"
-          }`}
-        >
-          📊 Health History
-        </button>
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-teal-50/20 to-slate-50 flex flex-col font-sans text-slate-800 selection:bg-teal-100 selection:text-teal-900">
+      {/* Header & Persistent Responsible AI Banner */}
+      <div className="no-print">
+        <AppHeader user={user} onSignOut={handleSignOut} />
+        <MedicalDisclaimerBanner />
       </div>
 
-      {/* MAIN CONTAINER */}
-      <main className="flex-1 max-w-6xl w-full mx-auto px-4 py-8">
-        {/* Welcome Greeting Header */}
-        <div className="mb-8">
-          <h2 className="text-lg font-semibold text-slate-700">
-            {(() => {
-              const hour = new Date().getHours();
-              let timeGreeting = "Good morning";
-              if (hour >= 5 && hour < 12) {
-                timeGreeting = "Good morning";
-              } else if (hour >= 12 && hour < 17) {
-                timeGreeting = "Good afternoon";
-              } else if (hour >= 17 && hour < 21) {
-                timeGreeting = "Good evening";
-              } else {
-                timeGreeting = "Good night";
-              }
-              const firstName = user.displayName ? user.displayName.trim().split(" ")[0] : "";
-              return firstName ? `${timeGreeting}, ${firstName} 👋` : `${timeGreeting} 👋`;
-            })()}
-          </h2>
-          <p className="text-sm text-slate-400 mt-0.5">
-            Here's your health dashboard
-          </p>
+      {/* Main Container */}
+      <main className="flex-1 max-w-6xl w-full mx-auto px-3 sm:px-6 py-6 space-y-6">
+        {/* Welcome Greeting Banner */}
+        <div className="no-print bg-white p-4 sm:p-6 rounded-2xl border border-teal-100 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <div className="flex items-center space-x-2">
+              <h1 className="text-lg sm:text-2xl font-bold text-slate-900">
+                {(() => {
+                  const hour = new Date().getHours();
+                  let timeGreeting = "Good morning";
+                  if (hour >= 12 && hour < 17) timeGreeting = "Good afternoon";
+                  else if (hour >= 17 && hour < 21) timeGreeting = "Good evening";
+                  else if (hour >= 21 || hour < 5) timeGreeting = "Good night";
+                  const firstName = user.displayName ? user.displayName.trim().split(" ")[0] : "Patient";
+                  return `${timeGreeting}, ${firstName} 👋`;
+                })()}
+              </h1>
+              <span className="bg-teal-100 text-teal-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                Active Portal
+              </span>
+            </div>
+            <p className="text-xs sm:text-sm text-slate-500 mt-1">
+              Select a clinical module below to consult your AI companion, analyze blood reports, or generate physician briefs.
+            </p>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content Area (col-span-2 on desktop) */}
-          <div className={`lg:col-span-2 flex flex-col gap-8 ${activeTabMobile === "history" ? "hidden md:flex" : "flex"}`}>
-            {/* FEATURE 4: DOCTOR VISIT BRIEF GENERATOR */}
-            <DoctorBriefGenerator user={user} onBriefSaved={handleTriggerRefresh} />
+        {/* Segmented Navigation Tab Bar */}
+        <div className="no-print flex items-center justify-center">
+          <div className="inline-flex p-1.5 bg-slate-200/80 backdrop-blur-md rounded-2xl border border-slate-300/70 shadow-inner max-w-full overflow-x-auto scrollbar-none gap-1">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as any)}
+                  className={`flex items-center space-x-2 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all duration-200 cursor-pointer ${
+                    isActive
+                      ? 'bg-white text-teal-700 shadow-sm font-bold scale-100'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/40'
+                  }`}
+                >
+                  <Icon className={`w-4 h-4 ${isActive ? 'text-teal-600' : 'text-slate-500'}`} />
+                  <span>{tab.label}</span>
+                  {tab.badge && (
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold uppercase hidden md:inline-block ${
+                      isActive ? 'bg-teal-100 text-teal-800' : 'bg-slate-300/80 text-slate-700'
+                    }`}>
+                      {tab.badge}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
-            {/* FEATURE A: AI HEALTH COMPANION CHAT */}
-            <HealthCompanion user={user} />
-
-            {/* FEATURE 2: MULTIMODAL LAB REPORT SCANNER */}
-            <LabReportScanner user={user} onScanSaved={handleTriggerRefresh} />
-
-            {/* FEATURE 3: DAILY SYMPTOM & WELLNESS JOURNAL */}
-            <SymptomJournal user={user} onJournalSaved={handleTriggerRefresh} />
+        {/* Tab Content Display */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
+            {activeTab === 'companion' && <HealthCompanion user={user} />}
+            {activeTab === 'scanner' && <LabReportScanner user={user} onScanSaved={handleTriggerRefresh} />}
+            {activeTab === 'journal' && <SymptomJournal user={user} onJournalSaved={handleTriggerRefresh} />}
+            {activeTab === 'brief' && <DoctorBriefGenerator user={user} onBriefSaved={handleTriggerRefresh} />}
+            {activeTab === 'history' && (
+              <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs">
+                <HealthHistorySidebar user={user} refreshTrigger={historyRefreshKey} />
+              </div>
+            )}
           </div>
 
-          {/* Right Sidebar Area (col-span-1 on desktop) */}
-          <aside className={`lg:col-span-1 ${activeTabMobile === "dashboard" ? "hidden md:block" : "block"}`}>
-            <div className="sticky top-20">
-              <HealthHistorySidebar user={user} refreshTrigger={historyRefreshKey} />
-            </div>
-          </aside>
+          {/* Persistent Sidebar on Desktop for Companion, Scanner, Journal, Brief views */}
+          {activeTab !== 'history' && (
+            <aside className="hidden lg:block lg:col-span-1">
+              <div className="sticky top-6">
+                <HealthHistorySidebar user={user} refreshTrigger={historyRefreshKey} />
+              </div>
+            </aside>
+          )}
         </div>
       </main>
 
       {/* Footer */}
-      <footer className="py-4 text-center text-xs text-slate-400 border-t border-slate-100 bg-white/50 print:hidden">
+      <footer className="no-print py-4 text-center text-xs text-slate-400 border-t border-slate-100 bg-white/50">
         WellBridge AI • Encrypted patient medical journal and AI multimodal reasoning engine
       </footer>
     </div>
