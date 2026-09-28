@@ -4,6 +4,19 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>WellBridge AI - Patient Health Journal & Medical Report Demystifier</title>
+    
+    <!-- PWA Manifest & App Metadata -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#0d9488" />
+    <meta name="application-name" content="WellBridge AI" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="WellBridge AI" />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <link rel="apple-touch-icon" href="/icon.svg" />
+
+    <!-- Open Graph & Social Cards -->
     <meta name="description" content="Patient Health Journal and Multimodal Medical Report Demystifier powered by Gemini and Firestore." />
     <meta property="og:title" content="WellBridge AI - Patient Health Journal & Medical Report Demystifier" />
     <meta property="og:description" content="Patient Health Journal and Multimodal Medical Report Demystifier powered by Gemini and Firestore." />
@@ -13,6 +26,14 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch((err) => {
+            console.log('ServiceWorker registration note:', err);
+          });
+        });
+      }
+    </script>
   </body>
 </html>
-
