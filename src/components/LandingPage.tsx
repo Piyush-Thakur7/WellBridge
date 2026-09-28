@@ -65,13 +65,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onSignIn, isLoading, e
             <div className="w-10 h-10 flex items-center justify-center bg-teal-50 rounded-xl border border-teal-100 shadow-xs">
               <WellBridgeLogo size={28} className="w-7 h-7" />
             </div>
-            <div>
-              <span className="text-lg font-bold tracking-tight text-slate-900 block leading-tight">
+            <div className="min-w-0">
+              <span className="text-base sm:text-lg font-bold tracking-tight text-slate-900 block leading-tight">
                 WellBridge AI
               </span>
-              <span className="text-[10px] text-teal-700 font-semibold tracking-wider uppercase">
-                Patient Intelligence
-              </span>
+              <p className="hidden sm:block text-[11px] text-slate-400 font-medium truncate">
+                Bridging Confusing Medical Reports to Everyday Life
+              </p>
             </div>
           </div>
 
