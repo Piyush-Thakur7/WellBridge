@@ -69,11 +69,11 @@ export default function App() {
   }
 
   const tabs = [
-    { id: 'companion', label: 'AI Companion', icon: MessageSquareHeart, badge: 'Live' },
-    { id: 'scanner', label: 'Lab Scanner', icon: FileText, badge: 'Vision OCR' },
-    { id: 'journal', label: 'Daily Journal', icon: Activity, badge: null },
-    { id: 'brief', label: 'Doctor Brief', icon: ClipboardList, badge: '1-Click' },
-    { id: 'history', label: 'Health History', icon: History, badge: null },
+    { id: 'companion', label: 'AI Companion', icon: MessageSquareHeart },
+    { id: 'scanner', label: 'Lab Scanner', icon: FileText },
+    { id: 'journal', label: 'Daily Journal', icon: Activity },
+    { id: 'brief', label: 'Doctor Brief', icon: ClipboardList },
+    { id: 'history', label: 'Health History', icon: History },
   ];
 
   return (
@@ -130,13 +130,6 @@ export default function App() {
                 >
                   <Icon className={`w-4 h-4 ${isActive ? 'text-teal-600' : 'text-slate-500'}`} />
                   <span>{tab.label}</span>
-                  {tab.badge && (
-                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold uppercase hidden md:inline-block ${
-                      isActive ? 'bg-teal-100 text-teal-800' : 'bg-slate-300/80 text-slate-700'
-                    }`}>
-                      {tab.badge}
-                    </span>
-                  )}
                 </button>
               );
             })}
@@ -144,26 +137,15 @@ export default function App() {
         </div>
 
         {/* Tab Content Display */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
-            {activeTab === 'companion' && <HealthCompanion user={user} />}
-            {activeTab === 'scanner' && <LabReportScanner user={user} onScanSaved={handleTriggerRefresh} />}
-            {activeTab === 'journal' && <SymptomJournal user={user} onJournalSaved={handleTriggerRefresh} />}
-            {activeTab === 'brief' && <DoctorBriefGenerator user={user} onBriefSaved={handleTriggerRefresh} />}
-            {activeTab === 'history' && (
-              <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs">
-                <HealthHistorySidebar user={user} refreshTrigger={historyRefreshKey} />
-              </div>
-            )}
-          </div>
-
-          {/* Persistent Sidebar on Desktop for Companion, Scanner, Journal, Brief views */}
-          {activeTab !== 'history' && (
-            <aside className="hidden lg:block lg:col-span-1">
-              <div className="sticky top-6">
-                <HealthHistorySidebar user={user} refreshTrigger={historyRefreshKey} />
-              </div>
-            </aside>
+        <div className="max-w-4xl mx-auto w-full">
+          {activeTab === 'companion' && <HealthCompanion user={user} />}
+          {activeTab === 'scanner' && <LabReportScanner user={user} onScanSaved={handleTriggerRefresh} />}
+          {activeTab === 'journal' && <SymptomJournal user={user} onJournalSaved={handleTriggerRefresh} />}
+          {activeTab === 'brief' && <DoctorBriefGenerator user={user} onBriefSaved={handleTriggerRefresh} />}
+          {activeTab === 'history' && (
+            <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs">
+              <HealthHistorySidebar user={user} refreshTrigger={historyRefreshKey} />
+            </div>
           )}
         </div>
       </main>
