@@ -133,14 +133,6 @@ export const DoctorBriefGenerator: React.FC<DoctorBriefGeneratorProps> = ({ user
       <div className="bg-white rounded-2xl p-5 sm:p-6 border border-teal-100 shadow-xs space-y-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-teal-700 bg-teal-50 border border-teal-200 px-2.5 py-0.5 rounded-full">
-                Clinical Workflow
-              </span>
-              <span className="text-[10px] font-semibold text-slate-400">
-                • 30-Day Synthesis
-              </span>
-            </div>
             <h2 className="text-base sm:text-xl font-bold text-slate-900">
               Doctor Visit Clinical Brief
             </h2>
@@ -221,9 +213,6 @@ export const DoctorBriefGenerator: React.FC<DoctorBriefGeneratorProps> = ({ user
           {/* Header Row with Title and Action Buttons */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3.5 border-b border-slate-200">
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-teal-700 bg-teal-50 border border-teal-200 px-2.5 py-0.5 rounded-full">
-                Physician Ready
-              </span>
               <h3 className="text-lg font-bold text-slate-900 mt-1">
                 30-Day Doctor Visit Clinical Brief
               </h3>
