@@ -1,18 +1,7 @@
-// WellBridge AI Service Worker for Chrome PWA Installation & Offline Caching
-const CACHE_NAME = 'wellbridge-ai-v1';
-const STATIC_ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/icon.svg'
-];
+// WellBridge AI Service Worker
+const CACHE_VERSION = 'wellbridge-v2';
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(STATIC_ASSETS);
-    })
-  );
   self.skipWaiting();
 });
 
@@ -20,22 +9,41 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
       return Promise.all(
-        keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
+        keys.map((key) => caches.delete(key))
       );
-    })
+    }).then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 
 self.addEventListener('fetch', (event) => {
-  // Pass through dynamic API and auth requests to network directly
-  if (event.request.url.includes('/api/') || event.request.url.includes('identitytoolkit') || event.request.url.includes('firestore')) {
+  // Always use network-first strategy to prevent blank screens on new releases
+  if (event.request.method !== 'GET') return;
+
+  // Let auth and API requests go directly to network
+  if (
+    event.request.url.includes('/api/') ||
+    event.request.url.includes('firebase') ||
+    event.request.url.includes('identitytoolkit') ||
+    event.request.url.includes('firestore') ||
+    event.request.url.includes('googleapis.com')
+  ) {
     return;
   }
 
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      return cachedResponse || fetch(event.request);
-    })
+    fetch(event.request)
+      .then((response) => {
+        // If valid response, clone and cache for offline fallback
+        if (response && response.status === 200 && response.type === 'basic') {
+          const responseToCache = response.clone();
+          caches.open(CACHE_VERSION).then((cache) => {
+            cache.put(event.request, responseToCache);
+          });
+        }
+        return response;
+      })
+      .catch(() => {
+        return caches.match(event.request).then((cached) => cached || Response.error());
+      })
   );
 });
