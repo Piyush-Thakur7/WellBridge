@@ -78,9 +78,13 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-teal-50/20 to-slate-50 flex flex-col font-sans text-slate-800 selection:bg-teal-100 selection:text-teal-900">
-      {/* Header & Persistent Responsible AI Banner */}
-      <div className="no-print">
+      {/* Sticky App Header (Pinned at top on mobile & desktop) */}
+      <div className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs no-print">
         <AppHeader user={user} onSignOut={handleSignOut} />
+      </div>
+
+      {/* Medical Disclaimer Banner */}
+      <div className="no-print">
         <MedicalDisclaimerBanner />
       </div>
 
@@ -101,9 +105,6 @@ export default function App() {
                   return `${timeGreeting}, ${firstName} 👋`;
                 })()}
               </h1>
-              <span className="bg-teal-100 text-teal-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
-                Active Portal
-              </span>
             </div>
             <p className="text-xs sm:text-sm text-slate-500 mt-1">
               Select a clinical module below to consult your AI companion, analyze blood reports, or generate physician briefs.
