@@ -55,15 +55,10 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ user, onSignOut }) => {
           <WellBridgeLogo size={28} className="w-7 h-7 sm:w-8 sm:h-8" />
         </div>
         <div className="min-w-0">
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            <h1 className="text-base sm:text-xl font-bold text-slate-900 leading-tight truncate">
-              WellBridge AI
-            </h1>
-            <span className="hidden md:inline-block text-[10px] font-bold uppercase tracking-wider bg-teal-50 text-teal-700 border border-teal-200 px-2 py-0.5 rounded-full shrink-0">
-              Patient Journal
-            </span>
-          </div>
-          <p className="hidden sm:block text-[10px] text-slate-400 italic truncate">
+          <h1 className="text-base sm:text-xl font-bold text-slate-900 leading-tight truncate">
+            WellBridge AI
+          </h1>
+          <p className="hidden sm:block text-[11px] text-slate-400 font-medium truncate">
             Bridging Confusing Medical Reports to Everyday Life
           </p>
         </div>
